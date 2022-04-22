@@ -1,0 +1,76 @@
+﻿{
+  "office365_1_Connection_DisplayName": {
+    "reference": {
+      "keyVault": {
+        "id": "/subscriptions/11803d4d-2343-4c72-ab2c-bcc5c8378195/resourceGroups/LogicApps/providers/Microsoft.KeyVault/vaults/ACSLogicAppKeyVault"
+      },
+      "secretName": "SQL-ACSLogicApps-Username"
+    }
+  },
+  "sql_1_Connection_Name": {
+    "value": "sql-1"
+  },
+  "sql_1_Connection_DisplayName": {
+    "value": "default default"
+  },
+  "sql_1_server": {
+    "value": "default"
+  },
+  "sql_1_database": {
+    "value": "default"
+  },
+  "sql_1_authType": {
+    "value": "windows"
+  },
+  "sql_1_username": {
+    "reference": {
+      "keyVault": {
+        "id": "/subscriptions/11803d4d-2343-4c72-ab2c-bcc5c8378195/resourceGroups/LogicApps/providers/Microsoft.KeyVault/vaults/ACSLogicAppKeyVault"
+      },
+      "secretName": "SQL-BcLogicApps-Username"
+    }
+  },
+  "sql_1_password": {
+    "reference": {
+      "keyVault": {
+        "id": "/subscriptions/11803d4d-2343-4c72-ab2c-bcc5c8378195/resourceGroups/LogicApps/providers/Microsoft.KeyVault/vaults/ACSLogicAppKeyVault"
+      },
+      "secretName": "SQL-BcLogicApps-Password"
+    }
+  },
+  "sql_1_gateway_id": {
+    "value": "/subscriptions/11803d4d-2343-4c72-ab2c-bcc5c8378195/resourceGroups/LogicApps/providers/Microsoft.Web/connectionGateways/DG-ACS-ONPREM"
+  },
+  "LogicAppLocation": {
+    "value": "uksouth"
+  },
+  "LogicAppName": {
+    "value": "OMS-Changeover-XWtoOMS"
+  },
+  "sql_1_encryptConnection": {
+    "value": false
+  },
+  "sql_1_privacySetting": {
+    "value": "None"
+  },
+  "keyvault_1_vaultName": {
+    "value": "ACSLogicAppKeyVault"
+  },
+  "keyvault_1_token:clientId": {
+    "reference": {
+      "keyVault": {
+        "id": "/subscriptions/11803d4d-2343-4c72-ab2c-bcc5c8378195/resourceGroups/LogicApps/providers/Microsoft.KeyVault/vaults/ACSLogicAppKeyVault"
+      },
+      "secretName": "KeyVaultAppID"
+    }
+  },
+  "keyvault_1_token:clientSecret": {
+    "reference": {
+      "keyVault": {
+        "id": "/subscriptions/11803d4d-2343-4c72-ab2c-bcc5c8378195/resourceGroups/LogicApps/providers/Microsoft.KeyVault/vaults/ACSLogicAppKeyVault"
+      },
+      "secretName": "KeyVaultPassword"
+    }
+  }
+
+}

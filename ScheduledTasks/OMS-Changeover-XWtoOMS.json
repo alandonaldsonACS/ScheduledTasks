@@ -1,0 +1,440 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "office365_1_Connection_Name": {
+      "type": "string",
+      "defaultValue": "office365"
+    },
+    "office365_1_Connection_DisplayName": {
+      "type": "string",
+      "metadata": {
+        "description": "Email Username credential"
+      }
+    },
+    "sql_1_Connection_Name": {
+      "type": "string",
+      "defaultValue": "sql"
+    },
+    "sql_1_Connection_DisplayName": {
+      "type": "string",
+      "defaultValue": "SQL"
+    },
+    "sql_1_server": {
+      "type": "string",
+      "metadata": {
+        "description": "SQL server name"
+      }
+    },
+    "sql_1_database": {
+      "type": "string",
+      "metadata": {
+        "description": "SQL database name"
+      }
+    },
+    "sql_1_username": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Username credential"
+      }
+    },
+    "sql_1_password": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Password credential"
+      }
+    },
+    "sql_1_encryptConnection": {
+      "type": "bool",
+      "metadata": {
+        "description": "Encrypt Connection"
+      }
+    },
+    "sql_1_privacySetting": {
+      "type": "string",
+      "metadata": {
+        "description": "Privacy Setting"
+      },
+      "allowedValues": [
+        "None",
+        "Private",
+        "Organizational",
+        "Public"
+      ]
+    },
+    "sql_1_authType": {
+      "type": "string",
+      "metadata": {
+        "description": "Authentication type to connect to your database"
+      },
+      "defaultValue": "windows",
+      "allowedValues": [
+        "windows",
+        "basic"
+      ]
+    },
+    "sql_1_gateway_id": {
+      "type": "string",
+      "defaultValue": "/subscriptions/11803d4d-2343-4c72-ab2c-bcc5c8378195/resourceGroups/LogicApps/providers/Microsoft.Web/connectionGateways/DG-ACS-ONPREM"
+    },
+    "keyvault_1_Connection_Name": {
+      "type": "string",
+      "defaultValue": "ACSLogicAppKeyVaultConnection"
+    },
+    "keyvault_1_Connection_DisplayName": {
+      "type": "string",
+      "defaultValue": "ACSLogicAppKeyVaultConnection"
+    },
+    "keyvault_1_vaultName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the vault"
+      },
+      "defaultValue": "ACSLogicAppKeyVault"
+    },
+    "keyvault_1_token:clientId": {
+      "type": "string",
+      "metadata": {
+        "description": "Client (or Application) ID of the Azure Active Directory application."
+      },
+      "defaultValue": "4493bd09-0666-43cb-b8c7-8d1f1296b180"
+    },
+    "keyvault_1_token:clientSecret": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Client secret of the Azure Active Directory application."
+      }
+    },
+    "keyvault_1_token:TenantId": {
+      "type": "string",
+      "metadata": {
+        "description": "The tenant ID for the Azure Active Directory application."
+      },
+      "defaultValue": "83d4856d-be92-446d-89e0-0947fd271bce"
+    },
+    "keyvault_1_token:grantType": {
+      "type": "string",
+      "metadata": {
+        "description": "Grant type"
+      },
+      "defaultValue": "client_credentials",
+      "allowedValues": [
+        "code",
+        "client_credentials"
+      ]
+    },
+    "LogicAppLocation": {
+      "type": "string",
+      "minLength": 1,
+      "allowedValues": [
+        "[resourceGroup().location]",
+        "eastasia",
+        "southeastasia",
+        "centralus",
+        "eastus",
+        "eastus2",
+        "westus",
+        "northcentralus",
+        "southcentralus",
+        "northeurope",
+        "westeurope",
+        "japanwest",
+        "japaneast",
+        "brazilsouth",
+        "australiaeast",
+        "australiasoutheast",
+        "southindia",
+        "centralindia",
+        "westindia",
+        "canadacentral",
+        "canadaeast",
+        "uksouth",
+        "ukwest",
+        "westcentralus",
+        "westus2",
+        "koreacentral",
+        "koreasouth",
+        "francecentral",
+        "francesouth",
+        "uaecentral",
+        "uaenorth",
+        "southafricanorth",
+        "southafricawest",
+        "switzerlandnorth",
+        "switzerlandwest",
+        "germanynorth",
+        "germanywestcentral",
+        "norwayeast",
+        "brazilsoutheast",
+        "westus3"
+      ],
+      "defaultValue": "uksouth"
+    },
+    "LogicAppName": {
+      "type": "string",
+      "minLength": 1,
+      "defaultValue": "OMS-Changeover-XWtoOMS"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "properties": {
+        "state": "Disabled",
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "actions": {
+            "Check_OMS_Orders_to_Despatch": {
+              "type": "If",
+              "expression": {
+                "and": [
+                  {
+                    "not": {
+                      "equals": [
+                        "@empty(body('Parse_SP_Results')?['Table1'])",
+                        true
+                      ]
+                    }
+                  }
+                ]
+              },
+              "actions": {
+                "For_Each_OMS_Order_to_Changeover": {
+                  "type": "Foreach",
+                  "foreach": "@body('Parse_SP_Results')?['Table1']",
+                  "actions": {
+                    "Execute_SP_OMS_Update_Despatch_Order": {
+                      "type": "ApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connection": {
+                            "name": "@parameters('$connections')['sql']['connectionId']"
+                          }
+                        },
+                        "method": "post",
+                        "body": {
+                          "OrderID": "@items('For_Each_OMS_Order_to_Changeover')?['OrderID']",
+                          "TimeString": "@variables('TimeString')"
+                        },
+                        "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('default'))},@{encodeURIComponent(encodeURIComponent('default'))}/procedures/@{encodeURIComponent(encodeURIComponent('[dbo].[sp_OMS_UpdateDespatchOrder]'))}"
+                      },
+                      "runAfter": {
+                        "Set_Timestring": [
+                          "Succeeded"
+                        ]
+                      }
+                    },
+                    "Set_Timestring": {
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "TimeString",
+                        "value": "@{concat('XEDO_', formatDateTime(utcNow(),'yyyyMMddhhmmssfffff'))}"
+                      },
+                      "runAfter": {}
+                    }
+                  },
+                  "runAfter": {},
+                  "runtimeConfiguration": {
+                    "concurrency": {
+                      "repetitions": 1
+                    }
+                  }
+                },
+                "Update_Last_Update_Date_Row": {
+                  "type": "ApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connection": {
+                        "name": "@parameters('$connections')['sql']['connectionId']"
+                      }
+                    },
+                    "method": "patch",
+                    "body": {
+                      "UpdateDate": "@variables('StartTime')"
+                    },
+                    "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('default'))},@{encodeURIComponent(encodeURIComponent('default'))}/tables/@{encodeURIComponent(encodeURIComponent('[API].[LastUpdateDate]'))}/items/@{encodeURIComponent(encodeURIComponent('36'))}"
+                  },
+                  "runAfter": {
+                    "For_Each_OMS_Order_to_Changeover": [
+                      "Succeeded"
+                    ]
+                  }
+                }
+              },
+              "runAfter": {
+                "Parse_SP_Results": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Compose_Start_Time": {
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "StartTime",
+                    "type": "string",
+                    "value": "@{convertFromUtc(utcNow(), 'GMT Standard Time')}"
+                  }
+                ]
+              },
+              "runAfter": {}
+            },
+            "Execute_SP_Get_OMS_Changeover_Orders": {
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['sql']['connectionId']"
+                  }
+                },
+                "method": "post",
+                "body": {},
+                "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent('default'))},@{encodeURIComponent(encodeURIComponent('default'))}/procedures/@{encodeURIComponent(encodeURIComponent('sp_Get_OMS_Changover_Orders'))}"
+              },
+              "runAfter": {
+                "Initialize_Timestamp_": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Initialize_Timestamp_": {
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "TimeString",
+                    "type": "string"
+                  }
+                ]
+              },
+              "runAfter": {
+                "Compose_Start_Time": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Parse_SP_Results": {
+              "type": "ParseJson",
+              "inputs": {
+                "content": "@body('Execute_SP_Get_OMS_Changeover_Orders')?['resultsets']",
+                "schema": {
+                  "properties": {
+                    "Table1": {
+                      "items": {
+                        "properties": {
+                          "OrderID": {
+                            "type": "integer"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "runAfter": {
+                "Execute_SP_Get_OMS_Changeover_Orders": [
+                  "Succeeded"
+                ]
+              }
+            }
+          },
+          "parameters": {
+            "$connections": {
+              "defaultValue": {},
+              "type": "Object"
+            }
+          },
+          "triggers": {
+            "Recurrence": {
+              "type": "Recurrence",
+              "recurrence": {
+                "frequency": "Minute",
+                "interval": 60
+              },
+              "runtimeConfiguration": {
+                "concurrency": {
+                  "runs": 1
+                }
+              },
+              "evaluatedRecurrence": {
+                "frequency": "Minute",
+                "interval": 60
+              }
+            }
+          },
+          "contentVersion": "1.0.0.0",
+          "outputs": {}
+        },
+        "parameters": {
+          "$connections": {
+            "value": {
+              "sql": {
+                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', 'uksouth', '/managedApis/', 'sql')]",
+                "connectionId": "[resourceId('Microsoft.Web/connections', parameters('sql_1_Connection_Name'))]",
+                "connectionName": "[parameters('sql_1_Connection_Name')]"
+              }
+            }
+          }
+        }
+      },
+      "name": "[parameters('LogicAppName')]",
+      "type": "Microsoft.Logic/workflows",
+      "location": "[parameters('LogicAppLocation')]",
+      "apiVersion": "2016-06-01",
+      "tags": {
+        "displayName": "LogicApp"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/connections', parameters('sql_1_Connection_Name'))]"
+      ]
+    },
+    {
+      "type": "MICROSOFT.WEB/CONNECTIONS",
+      "apiVersion": "2018-07-01-preview",
+      "name": "[parameters('sql_1_Connection_Name')]",
+      "location": "uksouth",
+      "properties": {
+        "api": {
+          "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', 'uksouth', '/managedApis/', 'sql')]"
+        },
+        "displayName": "[parameters('sql_1_Connection_DisplayName')]",
+        "parameterValues": {
+          "server": "[parameters('sql_1_server')]",
+          "database": "[parameters('sql_1_database')]",
+          "authType": "[parameters('sql_1_authType')]",
+          "username": "[parameters('sql_1_username')]",
+          "password": "[parameters('sql_1_password')]",
+          "encryptConnection": "[parameters('sql_1_encryptConnection')]",
+          "privacySetting": "[parameters('sql_1_privacySetting')]",
+          "gateway": {
+            "id": "[parameters('sql_1_gateway_id')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "MICROSOFT.WEB/CONNECTIONS",
+      "apiVersion": "2018-07-01-preview",
+      "name": "[parameters('keyvault_1_Connection_Name')]",
+      "location": "uksouth",
+      "properties": {
+        "api": {
+          "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', 'uksouth', '/managedApis/', 'keyvault')]"
+        },
+        "displayName": "[parameters('keyvault_1_Connection_DisplayName')]",
+        "parameterValues": {
+          "vaultName": "[parameters('keyvault_1_vaultName')]",
+          "token:clientId": "[parameters('keyvault_1_token:clientId')]",
+          "token:clientSecret": "[parameters('keyvault_1_token:clientSecret')]",
+          "token:TenantId": "[parameters('keyvault_1_token:TenantId')]",
+          "token:grantType": "[parameters('keyvault_1_token:grantType')]"
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}
