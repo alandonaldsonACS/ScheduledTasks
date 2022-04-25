@@ -1,23 +1,15 @@
-﻿{
-  "office365_1_Connection_DisplayName": {
-    "reference": {
-      "keyVault": {
-        "id": "/subscriptions/11803d4d-2343-4c72-ab2c-bcc5c8378195/resourceGroups/LogicApps/providers/Microsoft.KeyVault/vaults/ACSLogicAppKeyVault"
-      },
-      "secretName": "SQL-ACSLogicApps-Username"
-    }
-  },
+{
   "sql_1_Connection_Name": {
     "value": "sql-1"
   },
   "sql_1_Connection_DisplayName": {
-    "value": "default default"
+    "value": "ACSSQL2019-01 Formal10"
   },
   "sql_1_server": {
-    "value": "default"
+    "value": "ACSSQL2019-01"
   },
   "sql_1_database": {
-    "value": "default"
+    "value": "Formal10"
   },
   "sql_1_authType": {
     "value": "windows"
