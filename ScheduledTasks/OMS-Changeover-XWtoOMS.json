@@ -2,16 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "office365_1_Connection_Name": {
-      "type": "string",
-      "defaultValue": "office365"
-    },
-    "office365_1_Connection_DisplayName": {
-      "type": "string",
-      "metadata": {
-        "description": "Email Username credential"
-      }
-    },
     "sql_1_Connection_Name": {
       "type": "string",
       "defaultValue": "sql"
